@@ -1,3 +1,6 @@
 [submodule "impress.js"]
 	path = impress.js
 	url = git://github.com/bartaz/impress.js.git
+[submodule "markdown2impress"]
+	path = markdown2impress
+	url = git://github.com/yoshiki/markdown2impress.git
