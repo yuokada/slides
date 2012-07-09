@@ -4,7 +4,11 @@ Overview
 
 現在、発表済みの資料等はありませんがいろいろ試しながら発表資料を作成する予定です。
 
+slide tools
+-----------
+- [landslide 1.0.1 : Python Package Index](http://pypi.python.org/pypi/landslide/1.0.1 "landslide 1.0.1 : Python Package Index")
 
+    % landslide source.rst
 
 Link
 ----
