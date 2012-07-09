@@ -14,27 +14,105 @@
     </div>
 
 <div id="title" class="step" data-y="0" data-x="0">
-<h2>### あとがき</h2>
+<h1>MySQLチューニングとハードウェア</h1>
 
 </div>
 <div class="step" data-y="0" data-x="1200">
-<h2>チューニング大事です。</h2>
+<h2>自己紹介</h2>
+
+<ul>
+<li>yuokada</li>
+<li><a href="https://twitter.com/#!/uokada">@uokada</a></li>
+<li>2009入社</li>
+</ul>
 
 </div>
 <div class="step" data-y="0" data-x="2400">
-<p>2年連続で同じ事やってます。
-- そろそろ、飽きましたね(´Д｀)
-  - チューニング不要でまともに動くDBが使いたいです。
-  - ex. dynamo</p>
+<h2>概要</h2>
+
+<ol>
+<li>MySQLのチューニング</li>
+<li>Linuxカーネルのチューニング</li>
+<li>ハードウェア選定</li>
+<li>測定</li>
+<li>まとめ</li>
+<li>あとがき</li>
+</ol>
 
 </div>
 <div class="step" data-y="0" data-x="3600">
-<pre><code>[Apache CassandraとAmazon DynamoDBの比較 ｜ Classmethod.dev()](http://dev.classmethod.jp/cloud/apache-cassandra-and-amazon-dynamodb-compare/ "Apache CassandraとAmazon DynamoDBの比較 ｜ Classmethod.dev()")
-</code></pre>
+<h2>環境</h2>
 
-<p>- ハードウェアで解決できる問題はハードウェアを買って解決しましょう。
-  - チューニングは最後の付け足しです。
-  - ハードウェア選定を間違えた持点で積んでます。</p>
+<ul>
+<li>MySQL5.1</li>
+<li>CentOS5.6</li>
+<li>Kernel 2.67(あんまり気にしてないので不明)</li>
+</ul>
+
+</div>
+<div class="step" data-y="0" data-x="4800">
+<h2>MySQLのチューニング</h2>
+
+<ul>
+<li>innodb周りのチューニングについて話します。</li>
+</ul>
+
+</div>
+<div class="step" data-y="800" data-x="0">
+<h2>Linuxのチューニング</h2>
+
+<ul>
+<li>一般的なチューニングの話</li>
+</ul>
+
+</div>
+<div class="step" data-y="800" data-x="1200">
+<h2>ハードウェア選定</h2>
+
+<ul>
+<li>なぜここまでパフォーマンスが出ないのか??
+<ul>
+<li>真剣に考えた結果見えたのはハードウェアが悪いってことでした。</li>
+</ul></li>
+</ul>
+
+</div>
+<div class="step" data-y="800" data-x="2400">
+<h2>まとめ</h2>
+
+<ul>
+<li>ハードウェアで解決できる問題はハードウェアを買って解決しましょう。
+<ul>
+<li>チューニングは最後の付け足しです。</li>
+<li>ハードウェア選定を間違えた持点で積んでます。</li>
+</ul></li>
+</ul>
+
+</div>
+<div class="step" data-y="800" data-x="3600">
+<h2>雑感</h2>
+
+<ul>
+<li>2年連続で同じ事やってます。</li>
+<li>そろそろ、飽きましたね(´Д｀)
+<ul>
+<li>チューニング不要でまともに動くDBが使いたいです。</li>
+<li>ex. dynamo <a href="http://dev.classmethod.jp/cloud/apache-cassandra-and-amazon-dynamodb-compare/" title="Apache CassandraとAmazon DynamoDBの比較 ｜ Classmethod.dev()">Apache CassandraとAmazon DynamoDBの比較 ｜ Classmethod.dev()</a></li>
+</ul></li>
+</ul>
+
+</div>
+<div class="step" data-y="800" data-x="4800">
+<h2>あとがき</h2>
+
+<ul>
+<li>DBサーバーにおいてチューニングは大事な作業です。
+<ul>
+<li>ただし、ハードウェアの性能を使い切れてない場合に限る!!</li>
+<li>IOPSを100％使い切っている環境でチューニングしても多少改善する程度で
+<em>ほとんど意味が無い</em></li>
+</ul></li>
+</ul>
 
 </div>
 
