@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2010 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  Original slides: Marcin Wichary (mwichary@google.com)
+  Modifications: Ernest Delgado (ernestd@google.com)
+                 Alex Russell (slightlyoff@chromium.org)
+
+  landslide modifications: Adam Zapletal (adamzap@gmail.com)
+                           Nicolas Perriault (nperriault@gmail.com)
+-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>失敗から学ぶMySQLチューニング</title>
+    <!-- Styles -->
+    
+    <link rel="stylesheet" media="print" href="theme/css/print.css">
+    <link rel="stylesheet" media="screen, projection" href="theme/css/screen.css">
+    
+    
+    <!-- /Styles -->
+    <!-- Javascripts -->
+    
+    <script type="text/javascript" src="theme/js/slides.js"></script>
+    
+    
+    <!-- /Javascripts -->
+</head>
+<body>
+  <div id="blank"></div>
+  <div class="presentation">
+    <div id="current_presenter_notes">
+      <div id="presenter_note"></div>
+    </div>
+    <div class="slides">
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>失敗から学ぶMySQLチューニング</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              1/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>概要</h1></header>
+            
+            
+            <section><ol class="arabic simple">
+<li>本日のテーマ</li>
+<li>検証環境</li>
+<li>MySQLのチューニング</li>
+<li>Linuxカーネルのチューニング</li>
+<li>ハードウェア選定</li>
+<li>測定</li>
+<li>まとめ</li>
+<li>あとがき</li>
+</ol></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              2/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>本日のテーマ</h1></header>
+            
+            
+            <section><p>前期実施したMySQLのチューニングのまとめ。</p>
+<p>なんでこんなにハマったのか反省の意味でシェア。</p>
+<!-- **「勝ちに不思議の勝ちあり 負けに不思議の負けなし。」**
+
+失敗から学び、次に生かしましょうという話です。 --></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>チューニング実施環境</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>MySQL5.1</li>
+<li>CentOS5.6</li>
+<li>Kernel 2.6.18</li>
+</ul>
+<!-- 2006年リリースのカーネル --></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              4/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>MySQLのチューニング その1</h1></header>
+            
+            
+            <section><p>InnoDBのチューニングでデフォルトから変更したパラメータをいくつか紹介。</p>
+<ol class="arabic">
+<li><p class="first">innodb_buffer_pool_size ・・・ 一番大事な値。</p>
+<p>InnoDBのデータやインデックスをキャッシュするためのメモリ上の領域</p>
+<p>搭載メモリの80%程度を設定するのがデフォルト</p>
+</li>
+<li><p class="first">innodb_log_file_size ・・・ InnoDBの更新ログを記録するディスク上のログファイルのサイズ</p>
+<p>上限1GB程度で数百MBぐらいのサイズを割り当てるのがベター</p>
+<p><strong>大きくしすぎるとクラッシュリカバリの時間が長くなります</strong></p>
+</li>
+</ol></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              5/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>MySQLのチューニング その2</h1></header>
+            
+            
+            <section><ul>
+<li><p class="first">innodb_flush_log_at_trx_commit</p>
+<p>バッファに溜まったログをディクスにフラッシュするタイミングを指定するパラメータ</p>
+<p>デフォルト1だとコミットごとにフラッシュして非常に遅いのでアクティブマスター以外は0に設定するのがベター</p>
+</li>
+<li><p class="first">sync_binlog ・・・ バイナリログをディスクにフラッシュする方法を指定するパラメータ</p>
+<p>デフォルトは0。 MySQLではフラッシュさせずにOSに任せる設定。早い。</p>
+<p>1だとトランザクションごとにフラッシュする設定。遅い。</p>
+<p>マスターなら1、それ以外は0に設定するのが推奨</p>
+</li>
+</ul>
+<!-- - innodb_autoextend_increment --></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>MySQLのチューニング その3</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>query_cache_aize</li>
+<li>query_cache_type</li>
+</ul>
+<p>クエリとその実行結果をキャッシュし、次回から同じ内容のクエリが要求された場合にキャッシュから結果を返すための設定</p>
+<p>よっぽど更新がないテーブルでしか有効でない機能なので0に設定する</p>
+<p>&#64;ref: <a class="reference external" href="http://dsas.blog.klab.org/archives/52021866.html">DSAS開発者の部屋:クエリキャッシュは切ったほうがいいんじゃなイカ？</a></p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>Linuxのチューニング</h1></header>
+            
+            
+            <section><p>今回のチューニングではI/O周りのパラメータを2つ変更</p>
+<p>永続化するには <strong>/boot/grub/menu.lst</strong> を編集</p>
+<p>&#64;ref: <a class="reference external" href="http://haginov.blog35.fc2.com/blog-entry-45.html">ほえほえ LinuxファイルI/Oチューニング</a></p>
+<ul>
+<li><p class="first">nr_requests ・・・  I/O request queueの最大長を指定するパラメータ</p>
+<p>かなり大きくしても大丈夫。 デフォルトの数倍ぐらいでいいと思う。</p>
+</li>
+<li><p class="first">io_scheduler ・・・ I/Oデバイスのスケジューラを指定するパラメータ</p>
+<p>kernel2.6のデフォルトはcfq. DBはdeadlineに変更することを推奨。
+MyISAMでは有効だがInnoDBでは変更してもそれほど影響がないパラメータ</p>
+<p><strong>今回はdeadlineに変更しても効果が現れなかったのでcfqのまま</strong></p>
+</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              8/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>パラメータの変更方法</h1></header>
+            
+            
+            <section><pre class="literal-block">
+#nr_requestsを2048に変更
+% cat /sys/block/hda/queue/nr_requests
+256
+% sudo sh -c 'cat 2048 &gt; /sys/block/hda/queue/nr_requests
+% cat /sys/block/hda/queue/nr_requests
+2048
+</pre>
+<pre class="literal-block">
+#I/Oスケジューラをdeadlineに変更
+% cat /sys/block/hda/queue/scheduler
+noop anticipatory deadline [cfq]
+% sudo sh -c 'cat deadline &gt; /sys/block/hda/queue/scheduler'
+% cat /sys/block/hda/queue/scheduler
+noop anticipatory [deadline] cfq
+</pre>
+<p><strong>再起動不要 変更した瞬間から値が反映される</strong></p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>チューニングのまとめ</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>以上のチューニングをやったおかげでINSERTの性能が当初の3倍程度のパフォーマンスが出るようになりました。</li>
+<li>SELECTと組み合わせたテストは実施していないので本番でどこまでパフォーマンス落ちるのか不安</li>
+<li>最初、スタンバイマスターもマスターと同じ設定にしたことで
+レプリケーションの遅延が激しかったのでその他のスレーブと設定を合わせることで遅延を解消させた</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>データベースのボトルネック</h1></header>
+            
+            
+            <section><ul>
+<li><dl class="first docutils">
+<dt>問題の大半はディスクI/O(IOPS)がボトルネック</dt>
+<dd><ul class="first last simple">
+<li>IOPSは、ディスクが1秒当たりに処理できるI/Oアクセスの数</li>
+<li>SSDを選ぶことで大半は解消される</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">データがメモリに乗っている間はほとんどI/Oが発生しないので問題ないが</p>
+<p>データサイズがメモリからあふれるとディスクI/Oが発生し途端にパフォーマンスが悪化する</p>
+<ul class="simple">
+<li><strong>メモリから溢れないように設計・選定することが大事</strong></li>
+</ul>
+</li>
+</ul>
+<!-- - - - -
+RANGEパーティションについて
+- - - - - - - - - - - - - - - - - - - - - - - - - - -
+- RANGEパーティションが使える要件
+    - INSERT主体のテーブル
+    - SELECTも最新のデータへの参照しかしない
+- ex. ログテーブル
+- 巨大テーブルでインメモリでINSERTを完結させるための手法
+
+`ソーシャルゲームのためのデータベース設計 <http://www.slideshare.net/matsunobu/ss-6584540>`_ -->
+<!-- - - - -
+IOPS
+- - - -
+.. list-table:: ハードウェアのIOPS比較表
+   :widths: 90 90
+   :header-rows: 1
+
+   * - DISK
+     - IOPS
+   * - 7200rpm SATA
+     - 100
+   * - 15000 SAS
+     - 200
+   * - SSD(intel x-25)
+     - about 8600
+
+::
+
+    hd <- c('SATA', 'SAS', 'SSD')
+    iops <- c(100, 200, 6600)
+    iops.names <- hd
+    barplot(iops, names.arg=iops.names, col=c("blue", "green", "red", "yellow", "cyan"), ylim=c(0,500), xlab='IOPS compare')
+
+@ref: `IOPS - Wikipedia, the free encyclopedia <http://en.wikipedia.org/wiki/IOPS>`_ --></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>IOPSを比較したグラフ1</h1></header>
+            
+            
+            <section><img alt="IOPS-SATA_vs_SAS.png" src="IOPS-SATA_vs_SAS.png" /></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              12/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>IOPSを比較したグラフ2</h1></header>
+            
+            
+            <section><img alt="IOPS-compare.png" src="IOPS-compare.png" />
+<p>&#64;ref: <a class="reference external" href="http://en.wikipedia.org/wiki/IOPS">IOPS - Wikipedia, the free encyclopedia</a></p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              13/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>まとめ</h1></header>
+            
+            
+            <section><!-- * いいところよりも悪いところをチューニングで解消する -->
+<ul>
+<li><p class="first">チューニングは最後の付け足しです。</p>
+</li>
+<li><p class="first">データベースのボトルネックの原因はたいていハードウェア</p>
+</li>
+<li><dl class="first docutils">
+<dt>MySQLはRDBMSです。 データを入れるための箱ではありません。</dt>
+<dd><ul class="first last simple">
+<li><strong>正しい設計をして本来の用途で使いましょう！</strong></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              14/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>Link</h1></header>
+            
+            
+            <section><p><strong>参考資料</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.slideshare.net/matsunobu/linuxdb">Linux/DB Tuning (DevSumi2010, Japanese)</a></li>
+</ul>
+<!-- - - - -
+あとがき
+- - - - - - - -
+* 2年連続で同じ事やってます。
+    * そろそろ、飽きましたね(´Д｀)
+    * チューニング不要でまともに動くDBが使いたいです。
+
+    `Apache CassandraとAmazon DynamoDBの比較 ｜ Classmethod.dev() <http://dev.classmethod.jp/cloud/apache-cassandra-and-amazon-dynamodb-compare/>`_
+
+* DBサーバーにおいてチューニングは大事な作業です。
+    * ただし、ハードウェアの性能を使い切れてない場合に限る!!
+    * IOPSを100％使い切っている環境でチューニングしても多少改善する程度で*ほとんど意味が無い*
+
+* vm.swappiness = 0
+
+  vm.swappiness = 0 実メモリを使い切ったときに、ファイルシステムキャッシュを優先的に捨てて空きメモリを確保する プロセスサイズが実メモリを超えたら、プロセスがスワップされる --></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              15/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <div id="toc" class="sidebar hidden">
+    <h2>Table of Contents</h2>
+    <table>
+      <caption>Table of Contents</caption>
+      
+      <tr id="toc-row-1">
+        <th><a href="#slide1">失敗から学ぶMySQLチューニング</a></th>
+        <td><a href="#slide1">1</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-2">
+        <th><a href="#slide2">概要</a></th>
+        <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">本日のテーマ</a></th>
+        <td><a href="#slide3">3</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-4">
+        <th><a href="#slide4">チューニング実施環境</a></th>
+        <td><a href="#slide4">4</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-5">
+        <th><a href="#slide5">MySQLのチューニング その1</a></th>
+        <td><a href="#slide5">5</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-6">
+        <th><a href="#slide6">MySQLのチューニング その2</a></th>
+        <td><a href="#slide6">6</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-7">
+        <th><a href="#slide7">MySQLのチューニング その3</a></th>
+        <td><a href="#slide7">7</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-8">
+        <th><a href="#slide8">Linuxのチューニング</a></th>
+        <td><a href="#slide8">8</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-9">
+        <th><a href="#slide9">パラメータの変更方法</a></th>
+        <td><a href="#slide9">9</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-10">
+        <th><a href="#slide10">チューニングのまとめ</a></th>
+        <td><a href="#slide10">10</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-11">
+        <th><a href="#slide11">データベースのボトルネック</a></th>
+        <td><a href="#slide11">11</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-12">
+        <th><a href="#slide12">IOPSを比較したグラフ1</a></th>
+        <td><a href="#slide12">12</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-13">
+        <th><a href="#slide13">IOPSを比較したグラフ2</a></th>
+        <td><a href="#slide13">13</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-14">
+        <th><a href="#slide14">まとめ</a></th>
+        <td><a href="#slide14">14</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-15">
+        <th><a href="#slide15">Link</a></th>
+        <td><a href="#slide15">15</a></td>
+      </tr>
+      
+      
+    </table>
+  </div>
+  
+  <div id="help" class="sidebar hidden">
+    <h2>Help</h2>
+    <table>
+      <caption>Help</caption>
+      <tr>
+        <th>Table of Contents</th>
+        <td>t</td>
+      </tr>
+      <tr>
+        <th>Exposé</th>
+        <td>ESC</td>
+      </tr>
+      <tr>
+        <th>Full screen slides</th>
+        <td>e</td>
+      </tr>
+      <tr>
+        <th>Presenter View</th>
+        <td>p</td>
+      </tr>
+      <tr>
+        <th>Source Files</th>
+        <td>s</td>
+      </tr>
+      <tr>
+        <th>Slide Numbers</th>
+        <td>n</td>
+      </tr>
+      <tr>
+        <th>Toggle screen blanking</th>
+        <td>b</td>
+      </tr>
+      <tr>
+        <th>Show/hide slide context</th>
+        <td>c</td>
+      </tr>
+      <tr>
+        <th>Notes</th>
+        <td>2</td>
+      </tr>
+      <tr>
+        <th>Help</th>
+        <td>h</td>
+      </tr>
+    </table>
+  </div>
+  <script>main()</script>
+</body>
+</html>
