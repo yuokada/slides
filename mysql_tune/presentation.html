@@ -194,11 +194,10 @@
             
             <section><p>InnoDBのチューニングでデフォルトから変更したパラメータをいくつか紹介。</p>
 <ol class="arabic">
-<li><p class="first">innodb_buffer_pool_size ・・・ 一番大事な値。</p>
-<p>InnoDBのデータやインデックスをキャッシュするためのメモリ上の領域</p>
-<p>搭載メモリの80%程度を設定するのがデフォルト</p>
+<li><p class="first"><strong>innodb_buffer_pool_size</strong> ・・・ InnoDBのデータやIdxをキャッシュするメモリ領域</p>
+<p>InnoDBで一番重要な値。 搭載メモリの80%程度を設定するのがデフォルト</p>
 </li>
-<li><p class="first">innodb_log_file_size ・・・ InnoDBの更新ログを記録するディスク上のログファイルのサイズ</p>
+<li><p class="first"><strong>innodb_log_file_size</strong> ・・・ InnoDBの更新ログを記録するディスク上のログファイルのサイズ</p>
 <p>上限1GB程度で数百MBぐらいのサイズを割り当てるのがベター</p>
 <p><strong>大きくしすぎるとクラッシュリカバリの時間が長くなります</strong></p>
 </li>
@@ -233,11 +232,11 @@
             
             
             <section><ul>
-<li><p class="first">innodb_flush_log_at_trx_commit</p>
+<li><p class="first"><strong>innodb_flush_log_at_trx_commit</strong></p>
 <p>バッファに溜まったログをディクスにフラッシュするタイミングを指定するパラメータ</p>
 <p>デフォルト1だとコミットごとにフラッシュして非常に遅いのでアクティブマスター以外は0に設定するのがベター</p>
 </li>
-<li><p class="first">sync_binlog ・・・ バイナリログをディスクにフラッシュする方法を指定するパラメータ</p>
+<li><p class="first"><strong>sync_binlog</strong> ・・・ バイナリログをディスクにフラッシュする方法を指定するパラメータ</p>
 <p>デフォルトは0。 MySQLではフラッシュさせずにOSに任せる設定。早い。</p>
 <p>1だとトランザクションごとにフラッシュする設定。遅い。</p>
 <p>マスターなら1、それ以外は0に設定するのが推奨</p>
