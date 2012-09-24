@@ -70,7 +70,7 @@
             </aside>
             
             <aside class="page_number">
-              1/15
+              1/19
             </aside>
           </footer>
         </div>
@@ -109,7 +109,7 @@
             </aside>
             
             <aside class="page_number">
-              2/15
+              2/19
             </aside>
           </footer>
         </div>
@@ -125,6 +125,11 @@
             
             <section><p>前期実施したMySQLのチューニングのまとめ。</p>
 <p>なんでこんなにハマったのか反省の意味でシェア。</p>
+<p>まどか: <em>この夜からSATAでDBを運用することになったエンジニアを救いたい</em></p>
+<dl class="docutils">
+<dt>QB: <em>それが望みかい</em></dt>
+<dd><em>そんなことをしたらただでは済まないよ、まどか</em></dd>
+</dl>
 <!-- **「勝ちに不思議の勝ちあり 負けに不思議の負けなし。」**
 
 失敗から学び、次に生かしましょうという話です。 --></section>
@@ -143,7 +148,7 @@
             </aside>
             
             <aside class="page_number">
-              3/15
+              3/19
             </aside>
           </footer>
         </div>
@@ -178,7 +183,7 @@
             </aside>
             
             <aside class="page_number">
-              4/15
+              4/19
             </aside>
           </footer>
         </div>
@@ -217,7 +222,7 @@
             </aside>
             
             <aside class="page_number">
-              5/15
+              5/19
             </aside>
           </footer>
         </div>
@@ -258,7 +263,7 @@
             </aside>
             
             <aside class="page_number">
-              6/15
+              6/19
             </aside>
           </footer>
         </div>
@@ -294,7 +299,7 @@
             </aside>
             
             <aside class="page_number">
-              7/15
+              7/19
             </aside>
           </footer>
         </div>
@@ -336,7 +341,7 @@ MyISAMでは有効だがInnoDBでは変更してもそれほど影響がない�
             </aside>
             
             <aside class="page_number">
-              8/15
+              8/19
             </aside>
           </footer>
         </div>
@@ -382,7 +387,7 @@ noop anticipatory [deadline] cfq
             </aside>
             
             <aside class="page_number">
-              9/15
+              9/19
             </aside>
           </footer>
         </div>
@@ -417,7 +422,7 @@ noop anticipatory [deadline] cfq
             </aside>
             
             <aside class="page_number">
-              10/15
+              10/19
             </aside>
           </footer>
         </div>
@@ -433,11 +438,22 @@ noop anticipatory [deadline] cfq
             
             <section><ul>
 <li><dl class="first docutils">
-<dt>問題の大半はディスクI/O(IOPS)がボトルネック</dt>
+<dt>性能問題の大半はディスクI/O(IOPS)がボトルネックになります</dt>
 <dd><ul class="first last simple">
 <li>IOPSは、ディスクが1秒当たりに処理できるI/Oアクセスの数</li>
 <li>SSDを選ぶことで大半は解消される</li>
 </ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>性能が出ない場合は次の順番でボトルネックを解消します</dt>
+<dd><ol class="first last arabic simple">
+<li>クエリ改善</li>
+<li>MySQLパラメータのチューニング(OSのチューニング)</li>
+<li>設計見直し</li>
+<li>ハードウェアのスケールアップ・スケールアウト</li>
+</ol>
 </dd>
 </dl>
 </li>
@@ -448,7 +464,176 @@ noop anticipatory [deadline] cfq
 </ul>
 </li>
 </ul>
-<!-- - - - -
+<blockquote>
+<!-- このスライドが一番最初に来るべきでした。 -->
+</blockquote></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>クエリ改善</h1></header>
+            
+            
+            <section><ol class="arabic">
+<li><p class="first">スロークエリを抽出</p>
+</li>
+<li><dl class="first docutils">
+<dt>EXPLAIN 文で遅いクエリを改善</dt>
+<dd><ul class="first last simple">
+<li>サブクエリはJOINを使って改善</li>
+<li>テンポラリーテーブルを使って改善</li>
+<li>INDEXを使ってないクエリの改修</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">MySQL5.5？からSELECT以外の文のEXPLAINにも対応</p>
+</li>
+<li><p class="first">WHERE句なしのUPDATE,DELETEを見直す</p>
+</li>
+<li><p class="first">DELETEはそもそも重い</p>
+</li>
+</ol></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              12/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ハードウェアの性能比較</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              13/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>SATAとSASの比較</h1></header>
+            
+            
+            <section><table border="1" class="docutils">
+<caption>ハードウェアのIOPS比較表</caption>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">要素</th>
+<th class="head">SATA</th>
+<th class="head">SAS</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>IOPS</td>
+<td>100</td>
+<td>200</td>
+</tr>
+<tr><td>コマンドセット</td>
+<td>ATA</td>
+<td>SCSI</td>
+</tr>
+<tr><td>アーキテクチャ</td>
+<td>半2重   (読み書きどちらか一方だけの切替方式)</td>
+<td>全2重(読み書き同時の切り替え不要な方式)</td>
+</tr>
+<tr><td>用途</td>
+<td>低いI/O負荷</td>
+<td>高いI/O負荷</td>
+</tr>
+</tbody>
+</table>
+<!-- *DBのIO負荷はサーバーの種類の中でも一番高い部類です* --></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="sampleslide.rst">sampleslide.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              14/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: sampleslide.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            
+            <section><!-- - - - -
 RANGEパーティションについて
 - - - - - - - - - - - - - - - - - - - - - - - - - - -
 - RANGEパーティションが使える要件
@@ -497,7 +682,7 @@ IOPS
             </aside>
             
             <aside class="page_number">
-              11/15
+              15/19
             </aside>
           </footer>
         </div>
@@ -511,7 +696,10 @@ IOPS
             <header><h1>IOPSを比較したグラフ1</h1></header>
             
             
-            <section><img alt="IOPS-SATA_vs_SAS.png" src="IOPS-SATA_vs_SAS.png" /></section>
+            <section><ul class="simple">
+<li>SATAとSASのIOPSを比較してみた</li>
+</ul>
+<img alt="IOPS-SATA_vs_SAS.png" src="IOPS-SATA_vs_SAS.png" /></section>
             
           </div>
           <div class="presenter_notes">
@@ -527,7 +715,7 @@ IOPS
             </aside>
             
             <aside class="page_number">
-              12/15
+              16/19
             </aside>
           </footer>
         </div>
@@ -541,7 +729,10 @@ IOPS
             <header><h1>IOPSを比較したグラフ2</h1></header>
             
             
-            <section><img alt="IOPS-compare.png" src="IOPS-compare.png" />
+            <section><ul class="simple">
+<li>参考までにSSDのIOPSと比較してみた。</li>
+</ul>
+<img alt="IOPS-compare.png" src="IOPS-compare.png" />
 <p>&#64;ref: <a class="reference external" href="http://en.wikipedia.org/wiki/IOPS">IOPS - Wikipedia, the free encyclopedia</a></p></section>
             
           </div>
@@ -558,7 +749,7 @@ IOPS
             </aside>
             
             <aside class="page_number">
-              13/15
+              17/19
             </aside>
           </footer>
         </div>
@@ -602,7 +793,7 @@ IOPS
             </aside>
             
             <aside class="page_number">
-              14/15
+              18/19
             </aside>
           </footer>
         </div>
@@ -651,7 +842,7 @@ IOPS
             </aside>
             
             <aside class="page_number">
-              15/15
+              19/19
             </aside>
           </footer>
         </div>
@@ -732,26 +923,50 @@ IOPS
       
       
       <tr id="toc-row-12">
-        <th><a href="#slide12">IOPSを比較したグラフ1</a></th>
+        <th><a href="#slide12">クエリ改善</a></th>
         <td><a href="#slide12">12</a></td>
       </tr>
       
       
       <tr id="toc-row-13">
-        <th><a href="#slide13">IOPSを比較したグラフ2</a></th>
+        <th><a href="#slide13">ハードウェアの性能比較</a></th>
         <td><a href="#slide13">13</a></td>
       </tr>
       
       
       <tr id="toc-row-14">
-        <th><a href="#slide14">まとめ</a></th>
+        <th><a href="#slide14">SATAとSASの比較</a></th>
         <td><a href="#slide14">14</a></td>
       </tr>
       
       
       <tr id="toc-row-15">
-        <th><a href="#slide15">Link</a></th>
+        <th><a href="#slide15">-</a></th>
         <td><a href="#slide15">15</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-16">
+        <th><a href="#slide16">IOPSを比較したグラフ1</a></th>
+        <td><a href="#slide16">16</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-17">
+        <th><a href="#slide17">IOPSを比較したグラフ2</a></th>
+        <td><a href="#slide17">17</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-18">
+        <th><a href="#slide18">まとめ</a></th>
+        <td><a href="#slide18">18</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-19">
+        <th><a href="#slide19">Link</a></th>
+        <td><a href="#slide19">19</a></td>
       </tr>
       
       
